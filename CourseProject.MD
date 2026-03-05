@@ -382,13 +382,100 @@ You are expected to deliver a runnable system that generates graphs, enriches th
 
 Include a short report in docs that explains design decisions, configuration choices, and experiment results. Include a reproducible experiment script or command set that a grader can run on a clean machine. Include a brief demo, typically three to six minutes, that shows graph generation, a live run, and at least one algorithm result.
 
+## Submission deadline
+
+Saturday, April, 18 at 6AM. You should submit the link to your github repo using the Teams submission mechanism.
+
 ## Evaluation
 
-Grading focuses on correctness first, then on clarity and reproducibility.
-
-Correctness covers message handling, edge label enforcement, PDF driven traffic generation, initiation behavior for timer and input nodes, and algorithm properties.
-
-Reproducibility covers fixed seeds, configuration driven experiments, and clear build instructions.
-
+Grading focuses on correctness first, then on clarity and reproducibility. Correctness covers message handling, edge label enforcement, PDF driven traffic generation, initiation behavior for timer and input nodes, and algorithm properties. Reproducibility covers fixed seeds, configuration driven experiments, and clear build instructions. 
 Clarity covers code organization, documentation, and tests that justify important invariants.
 
+### Evaluation rubric
+
+This project is worth up to 20% of the course grade. Scoring starts at 20% and deductions are subtracted from 20%. The final grade cannot be less than 0%.
+
+#### Automatic zero conditions
+
+Your grade is 0% if any of the following is true.
+
+1. Core functionality does not work in the submitted version, or it is not implemented as specified in your documentation.
+2. The submission is essentially basic graph manipulation code examples copied from repositories, with no meaningful project implementation beyond that.
+
+### Definition of core functionality
+
+Core functionality means all items below work end to end on a clean machine using only your README instructions.
+
+1. Graph generation or loading works through NetGameSim and you can produce at least one graph artifact.
+2. Graph to actor mapping works, every node becomes an Akka classic actor and every edge becomes an outgoing channel modeled through destination ActorRef.
+3. Edge labels exist, are serialized, and are enforced so forbidden message types do not traverse an edge.
+4. Node PDFs exist, are configurable, and are used to generate message traffic.
+5. Computation initiation works using both mechanisms.
+   a. Timer nodes periodically emit messages.
+   b. Input nodes accept injected messages from the driver.
+6. The Akka system runs for a configured duration or until a terminating workload completes.
+7. The two assigned distributed algorithms are implemented, runnable, and integrated with the runtime.
+8. The program finishes a normal run without crashing and produces observable outputs such as logs, metrics, and results.
+
+### Deductions from the 20% maximum
+
+Deductions add up. Items that say up to are applied based on impact and severity.
+
+1. Using Python or any language other than Scala 3.x for the core system. Minus 10%.
+
+2. Fewer than 5 ScalaTest unit or integration tests. Up to minus 10%.
+   a. 4 tests. Minus 5%.
+   b. 2 to 3 tests. Minus 8%.
+   c. 0 to 1 test. Minus 10%.
+
+3. Missing comments and explanations that clarify design rationale and key modeling choices. Up to minus 10%.
+   This includes the message protocol, edge label enforcement, PDF sampling, and how algorithms plug into the runtime.
+
+4. Logging is not used meaningfully. Up to minus 5%.
+   Meaningful logging includes run start and stop, node initialization, initiation events, algorithm milestones, and summary results.
+
+5. Hardcoding input values in source code instead of using configuration libraries and config files. Up to minus 5%.
+   Hardcoding includes graph size, message sets, PDF parameters, initiators, algorithm selection, and run duration.
+
+6. Each var used for heap based shared variables or mutable collections without explicitly stated reasons. Minus 0.3% each.
+   Actor local mutable state can be acceptable if you justify it in comments or documentation.
+
+7. Each while loop, for loop, or other loop with an induction variable used to iterate over a collection. Minus 0.5% each.
+   Collection combinators like map, flatMap, foldLeft, and foreach are not penalized.
+
+8. README.md does not contain clear install and run instructions that work from a clean machine. Up to minus 10%.
+
+9. The program crashes without completing the core functionality. Up to minus 15%.
+   If the crash prevents demonstrating core functionality, this becomes an automatic zero condition.
+
+10. Documentation exists but is insufficient to understand your program design, your models, and how you assembled and deployed all components such as graph generation, enrichment, runtime, algorithms, and instrumentation. Up to minus 15%.
+
+11. The project does not import cleanly into IntelliJ using the sbt importer, or it requires manual IDE tweaks that are not documented. Up to minus 5%.
+    Examples include missing sbt modules, broken resource paths, or relying on local absolute paths.
+
+12. sbt compile or sbt test fails in a clean checkout. Minus 10% to automatic zero depending on severity.
+    If the failure blocks any demonstration of core functionality, it is an automatic zero condition.
+
+13. Resource and configuration packaging errors. Up to minus 5%.
+    Examples include application.conf not under src main resources, or the program only runs from an IDE run configuration and fails from sbt run.
+
+14. Blocking operations inside actors. Up to minus 5%.
+    Examples include Thread.sleep, Await.result, blocking file IO on the actor thread, or long CPU loops that starve the dispatcher.
+
+15. Message protocol is overly dynamic or stringly typed without justification. Up to minus 3%.
+    Examples include passing Any everywhere, relying on raw strings for message kinds, or not using a small message algebra with case classes.
+
+16. Lack of determinism controls for experiments. Up to minus 3%.
+    If you claim reproducible experiments but do not expose seeds and run parameters through configuration, points are deducted here.
+
+17. Cinnamon instrumentation is missing or non functional. Up to minus 5%.
+    Non functional means it is referenced in README but the build does not enable it, or nothing is instrumented in configuration.
+
+18. Repository hygiene issues that slow down grading. Up to minus 2%.
+    Examples include committing target directories, large generated binaries, or IDE caches.
+
+### How deductions are applied
+
+1. Deductions add up.
+2. Items labeled up to are applied partially based on impact.
+3. The final grade is max of 0% and 20% minus total deductions.
