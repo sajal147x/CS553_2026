@@ -19,8 +19,8 @@ object BullyLeaderElection {
   
   sealed trait LeaderMessage extends DistributedMessage
   case class Election(from: String, fromId: Int, sender: ActorRef[DistributedMessage]) extends LeaderMessage
-  case class Alive(from: String, sender: ActorRef[DistributedMessage]) extends LeaderMessage
-  case class Victory(leaderId: String, leaderIdNum: Int) extends LeaderMessage
+  private case class Alive(from: String, sender: ActorRef[DistributedMessage]) extends LeaderMessage
+  private case class Victory(leaderId: String, leaderIdNum: Int) extends LeaderMessage
   
   class BullyNode(
     nodeId: String,
